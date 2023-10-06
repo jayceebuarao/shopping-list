@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:shopping_list/widgets/grocery_list_item.dart';
 import 'package:shopping_list/data/dummy_items.dart';
 
-class GroceriesScreen extends StatefulWidget {
-  const GroceriesScreen({super.key});
+class GroceryListScreen extends StatefulWidget {
+  const GroceryListScreen({super.key});
 
   @override
-  State<GroceriesScreen> createState() => _GroceriesScreenState();
+  State<GroceryListScreen> createState() => _GroceryListScreenState();
 }
 
-class _GroceriesScreenState extends State<GroceriesScreen> {
+class _GroceryListScreenState extends State<GroceryListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
