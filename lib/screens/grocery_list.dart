@@ -28,9 +28,42 @@ class _GroceryListScreenState extends State<GroceryListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Widget content = ListView.builder(
+      itemCount: _groceryItems.length,
+      itemBuilder: (context, index) => GroceryListItem(
+        item: _groceryItems[index],
+      ),
+    );
+
+    if (_groceryItems.isEmpty) {
+      content = Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            'Nothing to see here! :)',
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                  color: Theme.of(context).colorScheme.onBackground,
+                ),
+          ),
+          const SizedBox(
+            height: 8,
+          ),
+          Text(
+            'Try adding an item with +',
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                  color: Theme.of(context).colorScheme.onBackground,
+                ),
+          )
+        ],
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Your Groceries'),
+        title: const Text('Grocery Shopping List'),
         actions: [
           IconButton(
             onPressed: _addItem,
@@ -38,12 +71,7 @@ class _GroceryListScreenState extends State<GroceryListScreen> {
           )
         ],
       ),
-      body: ListView.builder(
-        itemBuilder: (context, index) => GroceryListItem(
-          item: _groceryItems[index],
-        ),
-        itemCount: _groceryItems.length,
-      ),
+      body: content,
     );
   }
 }
