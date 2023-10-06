@@ -20,12 +20,10 @@ class GroceryListItem extends StatelessWidget {
           Text(item.quantity.toString())
         ],
       ),
-      leading: SizedBox(
+      leading: Container(
         width: 24,
         height: 24,
-        child: Container(
-          color: item.category.color,
-        ),
+        color: item.category.color,
       ),
     );
   }
