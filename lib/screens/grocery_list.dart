@@ -19,6 +19,7 @@ class _GroceryListScreenState extends State<GroceryListScreen> {
   List<GroceryItem> _groceryItems = [];
 
   var _isLoading = true;
+  String? _error;
 
   @override
   void initState() {
@@ -31,6 +32,13 @@ class _GroceryListScreenState extends State<GroceryListScreen> {
         'flutter-prep-8a968-default-rtdb.firebaseio.com', 'shopping-list.json');
 
     final response = await http.get(url);
+
+    if (response.statusCode >= 400) {
+      setState(() {
+        _error = 'Failed to fetch data. Please try again later.';
+      });
+    }
+
     final Map<String, dynamic> listData = json.decode(response.body);
     final List<GroceryItem> loadedItems = [];
     for (final item in listData.entries) {
@@ -135,6 +143,12 @@ class _GroceryListScreenState extends State<GroceryListScreen> {
             item: _groceryItems[index],
           ),
         ),
+      );
+    }
+
+    if (_error != null) {
+      content = Center(
+        child: Text(_error!),
       );
     }
 
