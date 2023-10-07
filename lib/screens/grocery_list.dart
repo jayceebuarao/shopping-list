@@ -18,6 +18,8 @@ class GroceryListScreen extends StatefulWidget {
 class _GroceryListScreenState extends State<GroceryListScreen> {
   List<GroceryItem> _groceryItems = [];
 
+  var _isLoading = true;
+
   @override
   void initState() {
     super.initState();
@@ -45,6 +47,7 @@ class _GroceryListScreenState extends State<GroceryListScreen> {
 
     setState(() {
       _groceryItems = loadedItems;
+      _isLoading = false;
     });
   }
 
@@ -90,42 +93,48 @@ class _GroceryListScreenState extends State<GroceryListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Widget content = ListView.builder(
-      itemCount: _groceryItems.length,
-      itemBuilder: (context, index) => Dismissible(
-        key: ValueKey(_groceryItems[index].id),
-        onDismissed: (direction) {
-          _removeItem(_groceryItems[index]);
-        },
-        child: GroceryListItem(
-          item: _groceryItems[index],
+    Widget content = Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          'Nothing to see here! :)',
+          textAlign: TextAlign.center,
+          style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                color: Theme.of(context).colorScheme.onBackground,
+              ),
         ),
-      ),
+        const SizedBox(
+          height: 8,
+        ),
+        Text(
+          'Try adding an item with +',
+          textAlign: TextAlign.center,
+          style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                color: Theme.of(context).colorScheme.onBackground,
+              ),
+        )
+      ],
     );
 
-    if (_groceryItems.isEmpty) {
-      content = Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            'Nothing to see here! :)',
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                  color: Theme.of(context).colorScheme.onBackground,
-                ),
+    if (_isLoading) {
+      content = const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
+    if (_groceryItems.isNotEmpty) {
+      content = ListView.builder(
+        itemCount: _groceryItems.length,
+        itemBuilder: (context, index) => Dismissible(
+          key: ValueKey(_groceryItems[index].id),
+          onDismissed: (direction) {
+            _removeItem(_groceryItems[index]);
+          },
+          child: GroceryListItem(
+            item: _groceryItems[index],
           ),
-          const SizedBox(
-            height: 8,
-          ),
-          Text(
-            'Try adding an item with +',
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                  color: Theme.of(context).colorScheme.onBackground,
-                ),
-          )
-        ],
+        ),
       );
     }
 
