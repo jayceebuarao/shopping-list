@@ -72,12 +72,23 @@ class _GroceryListScreenState extends State<GroceryListScreen> {
     });
   }
 
-  void _removeItem(GroceryItem item) {
+  void _removeItem(GroceryItem item) async {
     final itemIndex = _groceryItems.indexOf(item);
 
     setState(() {
       _groceryItems.removeAt(itemIndex);
     });
+
+    final url = Uri.https('flutter-prep-8a968-default-rtdb.firebaseio.com',
+        'shopping-list/${item.id}.json');
+
+    final response = await http.delete(url);
+
+    if (response.statusCode >= 400) {
+      setState(() {
+        _groceryItems.insert(itemIndex, item);
+      });
+    }
 
     ScaffoldMessenger.of(context)
         .clearSnackBars(); //clear snackbars before showing new snackbars
@@ -88,11 +99,28 @@ class _GroceryListScreenState extends State<GroceryListScreen> {
         action: SnackBarAction(
           //option to undo delete action
           label: 'Undo',
-          onPressed: () {
+          onPressed: () async {
             setState(() {
               _groceryItems.insert(itemIndex,
                   item); //insert deleted item back to original position
             });
+
+            final url = Uri.https(
+                'flutter-prep-8a968-default-rtdb.firebaseio.com',
+                'shopping-list.json');
+            http.post(
+              url,
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: json.encode(
+                {
+                  'name': item.name,
+                  'quantity': item.quantity,
+                  'category': item.category.categorytitle,
+                },
+              ),
+            );
           },
         ),
       ),
