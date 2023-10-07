@@ -39,6 +39,14 @@ class _GroceryListScreenState extends State<GroceryListScreen> {
       });
     }
 
+    if (response.body == 'null') {
+      setState(() {
+        _isLoading = false;
+      });
+
+      return;
+    }
+
     final Map<String, dynamic> listData = json.decode(response.body);
     final List<GroceryItem> loadedItems = [];
     for (final item in listData.entries) {
@@ -74,11 +82,6 @@ class _GroceryListScreenState extends State<GroceryListScreen> {
 
   void _removeItem(GroceryItem item) async {
     final itemIndex = _groceryItems.indexOf(item);
-
-    setState(() {
-      _groceryItems.removeAt(itemIndex);
-    });
-
     final url = Uri.https('flutter-prep-8a968-default-rtdb.firebaseio.com',
         'shopping-list/${item.id}.json');
 
@@ -88,8 +91,16 @@ class _GroceryListScreenState extends State<GroceryListScreen> {
       setState(() {
         _groceryItems.insert(itemIndex, item);
       });
+      return;
     }
 
+    setState(() {
+      _groceryItems.removeAt(itemIndex);
+    });
+
+    if (!context.mounted) {
+      return;
+    }
     ScaffoldMessenger.of(context)
         .clearSnackBars(); //clear snackbars before showing new snackbars
     ScaffoldMessenger.of(context).showSnackBar(
@@ -100,15 +111,10 @@ class _GroceryListScreenState extends State<GroceryListScreen> {
           //option to undo delete action
           label: 'Undo',
           onPressed: () async {
-            setState(() {
-              _groceryItems.insert(itemIndex,
-                  item); //insert deleted item back to original position
-            });
-
             final url = Uri.https(
                 'flutter-prep-8a968-default-rtdb.firebaseio.com',
                 'shopping-list.json');
-            http.post(
+            final response = await http.post(
               url,
               headers: {
                 'Content-Type': 'application/json',
@@ -121,6 +127,19 @@ class _GroceryListScreenState extends State<GroceryListScreen> {
                 },
               ),
             );
+
+            final Map<String, dynamic> resData = json.decode(response.body);
+
+            setState(() {
+              _groceryItems.add(
+                GroceryItem(
+                  id: resData['name'],
+                  name: item.name,
+                  quantity: item.quantity,
+                  category: item.category,
+                ),
+              );
+            });
           },
         ),
       ),
